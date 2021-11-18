@@ -7,22 +7,46 @@
 #include "lib/curses.h"
 using namespace std;
 
-void InitScreen(int W, int H);
+int InitScreen(int W, int H);
 WINDOW* wm;
+WINDOW* wn;
 
 int main() {
-	Engine e;
-	string filepath = "./map.txt";
-	int C, L;
-	e.LoadMap(filepath, C, L);
-	InitScreen(C, L);
-	e.Game();
-	refresh();
+	//Engine e;
+	Engine e[10];
+	vector<string> filepath;
+	int i, C, L, game_on, mode, sum_won = 0, sum_lost = 0;
+	for (i = 0; i < 10; i++)
+		filepath.push_back("./map.txt");
+	//e.LoadMap(filepath, C, L);
+	//InitScreen(C, L); 
+	//e.ShowMap(C, L,true); //GlobalMap
+	//e.Game();
+	i = 0;
+	do {
+		e[i].LoadMap(filepath[i], C, L);
+		mode = InitScreen(C, L);
+		mvprintw(2, 66, "Round: %d", i + 1);
+		mvprintw(4, 66, "Won: %d", sum_won);
+		mvprintw(5, 66, "Lost: %d", sum_lost);
+		refresh();
+		//if (i==0)
+		//	e[i].ShowMap(C, L, true); //GlobalMap
+		//else
+		//	e[i].ShowMap(C, L, false); //GlobalMap
+		game_on = e[i].Game(mode);
+		if (game_on == 1)
+			sum_won++;
+		else
+			sum_lost++;
+		i++;
+		endwin();  /* End curses mode */
+	} while (game_on != 0 && i < 10);
 	endwin();  /* End curses mode */
 	return 0;
 }
 
-void InitScreen(int W, int H) {
+int InitScreen(int W, int H) {
 	initscr(); /* Start curses mode */
 	start_color();
 	cbreak();
@@ -42,6 +66,57 @@ void InitScreen(int W, int H) {
 	refresh();
 	color_set(1, 0);
 	refresh();
+	int move, mode = 0;
+	wn = newwin(11, 15, 3, 25);
+	clearok(wn, true);
+	scrollok(wn, false);
+	wcolor_set(wn, 1, 0);
+	keypad(wn, FALSE);
+	werase(wn);
+	wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
+	wrefresh(wn);
+	mvprintw(4, 27, "Pick Mode:");
+	color_set(2, 0);
+	mvprintw(5, 27, "Easy");
+	color_set(1, 0);
+	mvprintw(6, 27, "Hard");
+	refresh();
+	move = getch();
+	while (move != 13) {
+		if (move == KEY_DOWN) {
+			color_set(1, 0);
+			mvprintw(5, 27, "Easy");
+			color_set(2, 0);
+			mvprintw(6, 27, "Hard");
+			color_set(1, 0);
+			mode = 1;
+		}
+		else if (move == KEY_UP) {
+			color_set(2, 0);
+			mvprintw(5, 27, "Easy");
+			color_set(1, 0);
+			mvprintw(6, 27, "Hard");
+			mode = 0;
+		}
+		move = getch();
+	}
+	wn = newwin(H + 2, 15, 1, W + 4);
+	mvprintw(4, 27, "          ");
+	mvprintw(5, 27, "    ");
+	mvprintw(6, 27, "    ");
+	wclear(wn);
+	wborder(wn, 0, 0, 0, 0, 0, 0, 0, 0);
+	color_set(3, 0);
+	mvprintw(0, 65, "*** Stats ***");
+	color_set(4, 0);
+	mvprintw(H + 3, 51, "* press backspace for cheats");
+	color_set(1, 0);
+	mvprintw(3, 66, "Mode:");
+	if (mode == 0)
+		mvprintw(3, 72, "Easy");
+	else
+		mvprintw(3, 72, "Hard");
+	wrefresh(wn);
 	wm = newwin(H + 2, W + 2, 1, 0);
 	clearok(wm, true);
 	scrollok(wm, false);
@@ -53,18 +128,14 @@ void InitScreen(int W, int H) {
 	wrefresh(wm);
 	getch();
 	mvprintw(11, 11, "                                       ");
-	werase(wm);
+	wclear(wm);
 	wborder(wm, 0, 0, 0, 0, 0, 0, 0, 0);
 	wrefresh(wm);
+	mvprintw(H + 3, 1, "Music:");
+	refresh();
+	color_set(3, 0);
+	mvprintw(H + 3, 7, "on");
+	color_set(1, 0);
+	refresh();
+	return mode;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

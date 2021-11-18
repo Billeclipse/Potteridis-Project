@@ -2,19 +2,19 @@
 #include <time.h>
 #include <stdlib.h>
 
-void Treasure::Init(char **map, int C, int L){
+void Treasure::Init(char** map, int C, int L) {
 	time_t t;
 	srand((unsigned)time(&t));
-	do{
+	do {
 		x = rand() % C;
 		y = rand() % L;
 	} while (map[y][x] != ' ');
 }
 
-int Treasure::getX(){
+int Treasure::getX() {
 	return x;
 }
 
-int Treasure::getY(){
+int Treasure::getY() {
 	return y;
 }
