@@ -106,6 +106,43 @@ void Harry::ShowTempMap(int W, int H) {
 	}
 }
 
+int Harry::FindSortestPath(char** newmap, int x, int y, int step) {
+	int res[4] = { 1000, 1000, 1000, 1000 };
+	int i, p;
+	if (newmap[y + 1][x] == 'T' || newmap[y - 1][x] == 'T' || newmap[y][x + 1] == 'T' || newmap[y][x - 1] == 'T')
+		return 0;
+	newmap[y][x] = '.';
+	if (newmap[y - 1][x] == ' ' || newmap[y - 1][x] == 'T' || newmap[y - 1][x] == 'C')
+		res[0] = Harry::FindSortestPath(newmap, x, y - 1, step + 1) + 1;
+	if (newmap[y + 1][x] == ' ' || newmap[y + 1][x] == 'T' || newmap[y + 1][x] == 'C')
+		res[1] = Harry::FindSortestPath(newmap, x, y + 1, step + 1) + 1;
+	if (newmap[y][x + 1] == ' ' || newmap[y][x + 1] == 'T' || newmap[y][x + 1] == 'C')
+		res[2] = Harry::FindSortestPath(newmap, x + 1, y, step + 1) + 1;
+	if (newmap[y][x - 1] == ' ' || newmap[y][x - 1] == 'T' || newmap[y][x - 1] == 'C')
+		res[3] = Harry::FindSortestPath(newmap, x - 1, y, step + 1) + 1;
+	newmap[y][x] = ' ';
+	p = 0;
+	for (i = 1; i < 4; i++)
+		if (res[i] < res[p])
+			p = i;
+	return res[p];
+}
+
+int Harry::getSteps(char** map) {
+	int newx, newy, steps;
+	char** newmap;
+	newmap = new char* [20];
+	for (int i = 0; i < 20; i++)
+		newmap[i] = new char[60];
+	for (int i = 0; i < 60; i++)
+		for (int j = 0; j < 20; j++)
+			newmap[j][i] = map[j][i];
+	newx = x;
+	newy = y;
+	steps = FindSortestPath(newmap, newx, newy, 0);
+	return steps;
+}
+
 /*void Harry::SaveMap(){
 	int i, j;
 	for (i = 0; i < 7; i++)

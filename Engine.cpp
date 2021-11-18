@@ -260,11 +260,18 @@ int Engine::Game(int mode) {
 			mvprintw(7, 66, "X= %d Y= %d", l[0]->getX(), l[0]->getY());
 			refresh();
 			color_set(5, 0);
-			mvprintw(8, 66, "Treasure:");
+			mvprintw(8, 66, "Treassure:");
 			refresh();
 			color_set(1, 0);
-			mvprintw(9, 66, "X= %d Y= %d", c.getX(), c.getY());
+			mvprintw(9, 66, "            ");
+			mvprintw(9, 66, "in %d steps", dynamic_cast<Harry*>(l[0])->getSteps(map));
 			refresh();
+			//color_set(5, 0);
+			//mvprintw(8, 66, "Treasure:");
+			//refresh();
+			//color_set(1, 0);
+			//mvprintw(9, 66, "X= %d Y= %d" ,c.getX(), c.getY());
+			//refresh();			
 			if (num_of_enemies <= 6) {
 				j = 0;
 				for (i = 1; i < l.size(); i++) {
